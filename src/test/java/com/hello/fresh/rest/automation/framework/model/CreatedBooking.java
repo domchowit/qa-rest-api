@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CreatedBooking {
-
-  Booking booking;
   Integer bookingid;
+  Booking booking;
 }

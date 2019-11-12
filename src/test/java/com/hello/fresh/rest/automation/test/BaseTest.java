@@ -3,6 +3,10 @@ package com.hello.fresh.rest.automation.test;
 import com.hello.fresh.rest.automation.framework.api.BookingApi;
 import com.hello.fresh.rest.automation.framework.conf.ConfigFeeder;
 import com.hello.fresh.rest.automation.framework.helper.TestHelper;
+import com.hello.fresh.rest.automation.framework.model.Booking;
+import com.hello.fresh.rest.automation.framework.model.BookingDTO;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,10 +38,18 @@ abstract public class BaseTest {
   @Before
   public void setUp() {
     bookingApi = new BookingApi(HOST);
+    TestHelper.setStartRoomId(getNonExistingRoomId());
   }
 
   protected void feedDBBeforeTest(int amount) {
     IntStream.range(0, amount).forEach(n -> bookingApi.postBooking(TestHelper.generateBookings()));
+  }
+
+  protected int getNonExistingRoomId(){
+    BookingDTO bookingDTO = bookingApi.getBookings().as(BookingDTO.class);
+    List<Booking> bookings = bookingDTO.getBookings();
+    List<Integer> ids = bookings.stream().map(booking -> booking.getRoomid()).collect(Collectors.toList());
+    return ids.stream().mapToInt(Integer::intValue).max().getAsInt();
   }
 
 }

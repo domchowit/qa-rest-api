@@ -8,8 +8,7 @@ import com.hello.fresh.rest.automation.framework.model.BookingDTO;
 import com.hello.fresh.rest.automation.framework.model.BookingDates;
 import com.hello.fresh.rest.automation.framework.model.CreatedBooking;
 import io.restassured.response.Response;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
 import org.junit.Test;
 
 public class BookingTest extends BaseTest {
@@ -36,21 +35,34 @@ public class BookingTest extends BaseTest {
     //when
     Response response = bookingApi.getBooking(createResponse.getBookingid());
     Booking actualBooking = response.as(Booking.class);
+
+    //then
+    assertThat(actualBooking.getBookingdates().getCheckin().getYear()).isEqualTo(expectedBooking.getBookingdates().getCheckin().getYear());
+    assertThat(actualBooking.getBookingdates().getCheckin().getMonth()).isEqualTo(expectedBooking.getBookingdates().getCheckin().getMonth());
+    assertThat(actualBooking.getBookingdates().getCheckin().getDayOfYear()).isEqualTo(expectedBooking.getBookingdates().getCheckin().getDayOfYear());
+    assertThat(actualBooking.getBookingdates().getCheckout().getYear()).isEqualTo(expectedBooking.getBookingdates().getCheckout().getYear());
+    assertThat(actualBooking.getBookingdates().getCheckout().getMonth()).isEqualTo(expectedBooking.getBookingdates().getCheckout().getMonth());
+    assertThat(actualBooking.getBookingdates().getCheckout().getDayOfYear()).isEqualTo(expectedBooking.getBookingdates().getCheckout().getDayOfYear());
+    assertThat(actualBooking.getRoomid()).isEqualTo(expectedBooking.getRoomid());
+    assertThat(actualBooking.getFirstname()).isEqualTo(expectedBooking.getFirstname());
+    assertThat(actualBooking.getDepositpaid()).isEqualTo(expectedBooking.getDepositpaid());
+    assertThat(actualBooking.getBookingid()).isNotNull();
+    assertThat(actualBooking.getBookingid()).isNotNegative();
     assertThat(response.getStatusCode()).isEqualTo(200);
   }
 
   @Test
   public void shouldNotBePossibleToBookARoomForTheSameDate() {
     //given
-    int ROOM_ID = 1500;
-    Date currentDate = new Date();
+    int ROOM_ID = getNonExistingRoomId();
+    LocalDateTime currentDate = LocalDateTime.now();
     Booking bookingOne = TestHelper.generateBookings();
     Booking bookingTwo = TestHelper.generateBookings();
 
     bookingOne
         .setBookingdates(BookingDates.builder()
             .checkin(currentDate)
-            .checkout(new Date(currentDate.getTime() + TimeUnit.DAYS.toMillis(1)))
+            .checkout(currentDate.plusDays(1))
             .dateAndTimeFormat(false)
             .build());
     bookingOne.setRoomid(ROOM_ID);
@@ -58,7 +70,7 @@ public class BookingTest extends BaseTest {
     bookingTwo
         .setBookingdates(BookingDates.builder()
             .checkin(currentDate)
-            .checkout(new Date(currentDate.getTime() + TimeUnit.DAYS.toMillis(2)))
+            .checkout(currentDate.plusDays(10))
             .dateAndTimeFormat(false)
             .build());
     bookingTwo.setRoomid(ROOM_ID);
@@ -75,12 +87,12 @@ public class BookingTest extends BaseTest {
   @Test
   public void checkoutShouldBeGraterThanCheckIn() {
     //given
-    Date currentDate = new Date();
+    LocalDateTime currentDate = LocalDateTime.now();
     Booking expectedBooking = TestHelper.generateBookings();
     expectedBooking
         .setBookingdates(BookingDates.builder()
             .checkin(currentDate)
-            .checkout(new Date(currentDate.getTime() - TimeUnit.DAYS.toMillis(1)))
+            .checkout(currentDate.minusDays(1))
             .dateAndTimeFormat(false)
             .build());
 
@@ -94,12 +106,12 @@ public class BookingTest extends BaseTest {
   @Test
   public void shouldAcceptDateOnlyFormat() {
     //given
-    Date currentDate = new Date();
+    LocalDateTime currentDate = LocalDateTime.now();
     Booking expectedBooking = TestHelper.generateBookings();
     expectedBooking
         .setBookingdates(BookingDates.builder()
             .checkin(currentDate)
-            .checkout(new Date(currentDate.getTime() + TimeUnit.DAYS.toMillis(1)))
+            .checkout(currentDate.plusDays(1))
             .dateAndTimeFormat(false)
             .build());
 
@@ -113,12 +125,12 @@ public class BookingTest extends BaseTest {
   @Test
   public void shouldAcceptDateAndTimeFormat() {
     //given
-    Date currentDate = new Date();
+    LocalDateTime currentDate = LocalDateTime.now();
     Booking expectedBooking = TestHelper.generateBookings();
     expectedBooking
         .setBookingdates(BookingDates.builder()
             .checkin(currentDate)
-            .checkout(new Date(currentDate.getTime() + TimeUnit.DAYS.toMillis(1)))
+            .checkout(currentDate.plusDays(1))
             .dateAndTimeFormat(true)
             .build());
 
@@ -129,15 +141,15 @@ public class BookingTest extends BaseTest {
     assertThat(createResponse.getStatusCode()).isEqualTo(CREATED_BOOKING_CODE);
   }
 
-  @Test
+  //  @Test
   public void deleteTest() {
     //given
-    Date currentDate = new Date();
+    LocalDateTime currentDate = LocalDateTime.now();
     Booking expectedBooking = TestHelper.generateBookings();
     expectedBooking
         .setBookingdates(BookingDates.builder()
             .checkin(currentDate)
-            .checkout(new Date(currentDate.getTime() + TimeUnit.DAYS.toMillis(1)))
+            .checkout(currentDate.plusDays(1))
             .dateAndTimeFormat(true)
             .build());
 

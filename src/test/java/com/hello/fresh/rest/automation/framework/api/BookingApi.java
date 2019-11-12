@@ -19,7 +19,7 @@ public class BookingApi extends RestClient {
   }
 
   public Response getBooking(int id) {
-    return doDeleteAndReturnResponse(String.format(BookingEndpoint.BOOKING.path(), id));
+    return doGetAndReturnResponse(String.format(BookingEndpoint.BOOKING.path(), id));
   }
 
   public Response deleteBooking(int id) {

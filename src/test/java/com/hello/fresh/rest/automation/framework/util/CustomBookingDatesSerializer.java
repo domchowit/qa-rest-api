@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.hello.fresh.rest.automation.framework.model.BookingDates;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 public class CustomBookingDatesSerializer extends StdSerializer<BookingDates> {
 
-  private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-  private SimpleDateFormat dateAndTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private DateTimeFormatter dateAndTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
 
   public CustomBookingDatesSerializer() {
     this(null);
